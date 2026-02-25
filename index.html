@@ -440,19 +440,8 @@
     <button type="button" class="tap-zone right" id="tapNext" aria-label="Next slide"></button>
 
     <section class="slide active" data-slide="1" aria-labelledby="s1-title">
-      <p class="chip-row"><span class="chip">Executive Briefing</span></p>
       <h1 id="s1-title">Missouri Child Welfare — Reconciliation &amp; Compliance Gate</h1>
-      <p class="subtitle">Grant reporting and compliance acceleration</p>
-      <div class="content">
-        <div class="card">
-          <h3>Walkthrough Focus</h3>
-          <ul>
-            <li>Replace fragmented manual reporting with a governed, auditable flow.</li>
-            <li>Demonstrate mock-to-live path: Salesforce operations to AWS evidence.</li>
-            <li>Show fail-safe behavior before any downstream export is initiated.</li>
-          </ul>
-        </div>
-      </div>
+      <p class="subtitle">Grant reporting and compliance acceleration through reconciled data, automated checks, and auditable exports.</p>
     </section>
 
     <section class="slide" data-slide="2" aria-labelledby="s2-title">
@@ -612,14 +601,14 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
       <div class="content">
         <ul class="bullets">
           <li>Checks include required fields, consent, restricted data, date logic, and case status.</li>
-          <li>If a check fails, Salesforce Flow creates a remediation task and Chatter alert for the case owner.</li>
+          <li>If a check fails, Salesforce Flow creates a remediation task and sends an email alert to the case owner.</li>
           <li>AI-style guidance is attached so caseworkers know the next best action immediately.</li>
           <li>If all checks pass, the package is prepared with audit context.</li>
           <li>Every decision is timestamped for reporting and audit review.</li>
         </ul>
         <div class="chip-row">
           <span class="chip">Status: Pass / Fail</span>
-          <span class="chip">Task + Chatter</span>
+          <span class="chip">Task + Email</span>
           <span class="chip">AI Guidance</span>
           <span class="chip">Audit Record</span>
         </div>
@@ -642,7 +631,7 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
           <h3>After</h3>
           <ul>
             <li>Data is reconciled and scored before export.</li>
-            <li>Non-compliant records are blocked with Task + Chatter outreach.</li>
+            <li>Non-compliant records are blocked with Task + Email outreach.</li>
             <li>Compliant packages are auditable and publish-ready.</li>
           </ul>
         </aside>
@@ -659,7 +648,7 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
             <div class="v">BLOCKED</div>
           </div>
           <div class="badge blocked">
-            <div class="k">Task + Chatter</div>
+            <div class="k">Task + Email</div>
             <div class="v">Sent to Case Managers</div>
           </div>
           <div class="badge">
@@ -669,7 +658,7 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
         </div>
         <ul class="bullets">
           <li>Export is denied before package publication.</li>
-          <li>Caseworker queue gets an actionable task and a Chatter post.</li>
+          <li>Caseworker queue gets an actionable task plus email notification.</li>
           <li>AI-style remediation text explains how to fix the record quickly.</li>
           <li>Pipeline logs preserve reason codes for compliance review.</li>
         </ul>
@@ -684,7 +673,7 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
           <h3>Impact</h3>
           <ul>
             <li>Faster reporting cycles by moving reconciliation and compliance checks earlier in the process.</li>
-            <li>Less manual rework for case teams through automated Tasks, Chatter alerts, and AI guidance.</li>
+            <li>Less manual rework for case teams through automated Tasks, email alerts, and AI guidance.</li>
             <li>Stronger grant readiness with fail-fast controls that block non-compliant exports before submission.</li>
             <li>Higher audit confidence through consistent logs, manifests, and traceable decision records.</li>
             <li>External benchmarks show digital public-service workflows can reduce time and delivery cost compared with manual channels (IDB, UK GOV.UK).</li>
@@ -708,13 +697,13 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
           <h3>Walkthrough order</h3>
           <ol class="bullets">
             <li>Salesforce Home -> show compliance dashboard posture.</li>
-            <li>Run blocked export -> show task + Chatter alert + AI guidance text.</li>
+            <li>Run blocked export -> show task + email alert + AI guidance text.</li>
             <li>Run compliant export -> show initiated status and export ID.</li>
             <li>Open AWS logs/storage -> verify evidence was updated.</li>
           </ol>
           <h3 style="margin-top:16px;">What to click</h3>
           <ul>
-            <li><strong>Salesforce:</strong> Service app -> Home -> Tasks -> Case Feed (Chatter).</li>
+            <li><strong>Salesforce:</strong> Service app -> Home -> Tasks -> related email alert evidence.</li>
             <li><strong>API docs:</strong> /docs -> POST /compliance and POST /export.</li>
             <li><strong>AWS:</strong> CloudWatch log group + S3 exports prefix.</li>
           </ul>
