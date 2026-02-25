@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Missouri Child Welfare — Reconciliation & Compliance Gate</title>
+  <meta name="description" content="Executive demo deck for Missouri Child Welfare reconciliation, compliance gating, and AWS-backed grant reporting flow.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Missouri Child Welfare — Reconciliation & Compliance Gate">
+  <meta property="og:description" content="Grant reporting and compliance acceleration demo deck.">
+  <meta property="og:image" content="https://example.com/placeholder-og-image.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b1f33'/%3E%3Cpath d='M14 42L24 24l8 12 8-14 10 20' stroke='%2328b7a7' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #081423;
+      --bg-alt: #0d1c2e;
+      --panel: #12263b;
+      --panel-soft: #162d45;
+      --ink: #e6edf4;
+      --ink-muted: #b6c3d1;
+      --teal: #29b8a8;
+      --teal-soft: #7ce0d5;
+      --danger: #ef5d62;
+      --warn: #f3b63f;
+      --ok: #3ecf8e;
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+      --radius: 16px;
+      --space: 8px;
+      --deck-max: 1240px;
+      --transition: 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(180deg, #07121f 0%, #0c1b2d 100%);
+      color: var(--ink);
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: calc(var(--space) * 2);
+      padding: calc(var(--space) * 2);
+    }
+
+    .topbar {
+      width: min(100%, var(--deck-max));
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: calc(var(--space) * 2);
+      background: rgba(13, 28, 46, 0.9);
+      border: 1px solid rgba(124, 224, 213, 0.18);
+      border-radius: 999px;
+      padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .topbar .brand {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--space) * 1.25);
+      min-width: 240px;
+      max-width: 420px;
+      width: 45%;
+    }
+
+    .progress-count {
+      font-size: 0.92rem;
+      color: var(--ink-muted);
+      min-width: 52px;
+      text-align: right;
+    }
+
+    .progress-rail {
+      flex: 1;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--teal), var(--teal-soft));
+      transition: width var(--transition);
+    }
+
+    .deck {
+      position: relative;
+      width: min(100%, var(--deck-max));
+      margin: 0 auto;
+      min-height: min(76vh, 760px);
+      border-radius: calc(var(--radius) + 6px);
+      overflow: hidden;
+      background: linear-gradient(160deg, rgba(13, 28, 46, 0.95) 0%, rgba(7, 20, 35, 0.98) 100%);
+      border: 1px solid rgba(124, 224, 213, 0.15);
+      box-shadow: var(--shadow);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: calc(var(--space) * 7) calc(var(--space) * 8);
+      opacity: 0;
+      transform: translateX(2.8%);
+      pointer-events: none;
+      transition: opacity var(--transition), transform var(--transition);
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: calc(var(--space) * 2.25);
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .slide h1,
+    .slide h2 {
+      margin: 0;
+      line-height: 1.18;
+      letter-spacing: 0.01em;
+      max-width: 18ch;
+    }
+
+    .slide h1 { font-size: clamp(2rem, 4vw, 3.4rem); }
+    .slide h2 { font-size: clamp(1.7rem, 3vw, 2.6rem); }
+
+    .subtitle {
+      font-size: clamp(1rem, 1.8vw, 1.3rem);
+      color: var(--ink-muted);
+      max-width: 64ch;
+      margin: 0;
+    }
+
+    .content {
+      display: grid;
+      gap: calc(var(--space) * 2.25);
+      align-content: start;
+    }
+
+    .bullets {
+      margin: 0;
+      padding-left: calc(var(--space) * 2.5);
+      display: grid;
+      gap: calc(var(--space) * 1.2);
+      max-width: 70ch;
+    }
+
+    .bullets li {
+      color: var(--ink-muted);
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      line-height: 1.48;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--space) * 1);
+    }
+
+    .chip {
+      background: rgba(41, 184, 168, 0.14);
+      color: var(--teal-soft);
+      border: 1px solid rgba(124, 224, 213, 0.24);
+      border-radius: 999px;
+      padding: calc(var(--space) * 0.75) calc(var(--space) * 1.4);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: calc(var(--space) * 2);
+      align-items: start;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(22, 45, 69, 0.92) 0%, rgba(15, 32, 50, 0.95) 100%);
+      border: 1px solid rgba(124, 224, 213, 0.14);
+      border-radius: var(--radius);
+      padding: calc(var(--space) * 2);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+    }
+
+    .card h3 {
+      margin: 0 0 calc(var(--space) * 1.25) 0;
+      font-size: 1.05rem;
+      color: var(--teal-soft);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .card p,
+    .card li {
+      margin: 0;
+      color: var(--ink-muted);
+      line-height: 1.45;
+      font-size: 0.98rem;
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: calc(var(--space) * 2.3);
+      display: grid;
+      gap: calc(var(--space) * 0.8);
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: calc(var(--radius) - 4px);
+      border: 1px solid rgba(124, 224, 213, 0.18);
+      background: rgba(7, 20, 35, 0.55);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: calc(var(--space) * 1.15) calc(var(--space) * 1.25);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--ink-muted);
+      font-size: 0.95rem;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: rgba(18, 38, 59, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--space) * 1.25);
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: calc(var(--space) * 1.2) calc(var(--space) * 1.4);
+      min-width: 180px;
+    }
+
+    .badge .k { font-size: 0.8rem; color: var(--ink-muted); }
+    .badge .v { font-size: 1.15rem; font-weight: 700; margin-top: calc(var(--space) * 0.4); }
+    .badge.blocked .v { color: var(--danger); }
+    .badge.pass .v { color: var(--ok); }
+
+    .diagram-block {
+      border: 1px solid rgba(124, 224, 213, 0.18);
+      border-radius: var(--radius);
+      background: rgba(7, 20, 35, 0.65);
+      padding: calc(var(--space) * 1.25);
+      overflow: auto;
+    }
+
+    .diagram-fallback {
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .diagram-fallback.hidden { display: none; }
+
+    .mermaid {
+      display: none;
+      min-width: 540px;
+      padding: calc(var(--space) * 0.5);
+      color: var(--ink);
+    }
+
+    .mermaid.ready { display: block; }
+
+    .callout {
+      border-left: 4px solid var(--teal);
+      background: rgba(41, 184, 168, 0.1);
+      border-radius: 10px;
+      padding: calc(var(--space) * 1.2) calc(var(--space) * 1.3);
+      color: var(--ink-muted);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .actions {
+      position: absolute;
+      bottom: calc(var(--space) * 2);
+      right: calc(var(--space) * 2);
+      display: flex;
+      gap: calc(var(--space) * 1);
+      z-index: 5;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid rgba(124, 224, 213, 0.28);
+      background: rgba(13, 28, 46, 0.95);
+      color: var(--ink);
+      border-radius: 10px;
+      padding: calc(var(--space) * 0.9) calc(var(--space) * 1.4);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform var(--transition), background var(--transition), border-color var(--transition);
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      background: rgba(41, 184, 168, 0.2);
+      border-color: rgba(124, 224, 213, 0.5);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .tap-zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 13%;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .tap-zone.left { left: 0; }
+    .tap-zone.right { right: 0; }
+
+    .footer {
+      width: min(100%, var(--deck-max));
+      margin: 0 auto;
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      gap: calc(var(--space) * 2);
+      opacity: 0.92;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      border: 0;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 980px) {
+      .slide { padding: calc(var(--space) * 4) calc(var(--space) * 4); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .topbar { border-radius: 14px; }
+      .progress-wrap { width: 55%; }
+      .tap-zone { width: 18%; }
+    }
+
+    @media (max-width: 680px) {
+      body { padding: calc(var(--space) * 1.2); }
+      .deck { min-height: 78vh; }
+      .slide { gap: calc(var(--space) * 1.5); }
+      .footer { font-size: 0.82rem; flex-direction: column; }
+      .actions { bottom: calc(var(--space) * 1.25); right: calc(var(--space) * 1.25); }
+      .btn { padding: calc(var(--space) * 0.8) calc(var(--space) * 1.1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; }
+      .slide,
+      .progress-bar,
+      .btn { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" aria-label="Deck status bar">
+    <div class="brand">Executive Demo Deck · Public Sector Reconciliation</div>
+    <div class="progress-wrap" aria-label="Slide progress">
+      <span id="progressCount" class="progress-count">1 / 12</span>
+      <div class="progress-rail" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="deck" class="deck" aria-live="polite">
+    <button type="button" class="tap-zone left" id="tapPrev" aria-label="Previous slide"></button>
+    <button type="button" class="tap-zone right" id="tapNext" aria-label="Next slide"></button>
+
+    <section class="slide active" data-slide="1" aria-labelledby="s1-title">
+      <p class="chip-row"><span class="chip">Executive Briefing</span></p>
+      <h1 id="s1-title">Missouri Child Welfare — Reconciliation &amp; Compliance Gate</h1>
+      <p class="subtitle">Grant reporting and compliance acceleration</p>
+      <div class="content">
+        <div class="card">
+          <h3>Walkthrough Focus</h3>
+          <ul>
+            <li>Replace fragmented manual reporting with a governed, auditable flow.</li>
+            <li>Demonstrate mock-to-live path: Salesforce operations to AWS evidence.</li>
+            <li>Show fail-safe behavior before any downstream export is initiated.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="2" aria-labelledby="s2-title">
+      <h2 id="s2-title">Problem: Why teams lose reporting time</h2>
+      <p class="subtitle">Current-state operations are accurate only after heavy manual cleanup.</p>
+      <div class="content">
+        <ul class="bullets">
+          <li>Case data is spread across multiple systems with inconsistent IDs and formats.</li>
+          <li>Manual reconciliation introduces delays, rework, and avoidable compliance risk.</li>
+          <li>Grant reporting deadlines depend on tribal knowledge instead of deterministic controls.</li>
+          <li>Audit trails are incomplete when provenance and decisions are not captured in-line.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="3" aria-labelledby="s3-title">
+      <h2 id="s3-title">Use Case: Streamline grant reporting</h2>
+      <p class="subtitle">Goal: move from spreadsheet governance to operational compliance by design.</p>
+      <div class="content grid-2">
+        <article class="card">
+          <h3>Operational Intent</h3>
+          <ul>
+            <li>Reconcile messy records before export eligibility is evaluated.</li>
+            <li>Block non-compliant payloads with immediate remediation actions.</li>
+            <li>Publish only validated packages to AWS evidence targets.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Success Criteria</h3>
+          <ul>
+            <li>Repeatable checks, explicit ownership, and timestamped decisions.</li>
+            <li>Caseworker-visible tasking for unresolved data quality issues.</li>
+            <li>Audit-ready output with immutable package and run context.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="4" aria-labelledby="s4-title">
+      <h2 id="s4-title">Why current-state fails</h2>
+      <p class="subtitle">The same household can appear differently across Salesforce pages and form sources.</p>
+      <div class="content">
+        <div class="chip-row" aria-label="Fragmented data surfaces">
+          <span class="chip">Household / Account</span>
+          <span class="chip">Contact</span>
+          <span class="chip">Role</span>
+          <span class="chip">Case</span>
+          <span class="chip">Form Submission</span>
+          <span class="chip">External Assertions</span>
+        </div>
+        <ul class="bullets">
+          <li>Address, county, and composition fields drift between household and submitted forms.</li>
+          <li>Role collisions occur when a contact is assigned conflicting workforce/caregiver roles.</li>
+          <li>Case dates and consent flags diverge across intake, external systems, and updates.</li>
+          <li>Missing state IDs and stale placements break downstream eligibility checks.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="5" aria-labelledby="s5-title">
+      <h2 id="s5-title">Mock setup architecture overview</h2>
+      <p class="subtitle">Local-first execution with Salesforce operations and AWS publication path.</p>
+      <div class="content">
+        <div class="diagram-block">
+          <pre class="diagram-fallback">[Diagram fallback]
+Missouri Manual + Forms (mock) -> Canonical Catalog -> Salesforce Fragmented Objects
+-> Reconciliation Engine -> Compliance Gate -> Export Packager -> AWS Evidence Targets</pre>
+          <div class="mermaid" data-diagram="flowchart LR
+A[Missouri DSS Manual and Forms\nMock Ingestion] --> B[Canonical Field Catalog]
+B --> C[Salesforce Fragmented Model\nHousehold Contact Role Case]
+C --> D[Reconciliation Engine\nDeterministic plus Heuristic]
+D --> E[Compliance Gate\nFail Fast Rules]
+E -->|Pass| F[Export Package and Manifest]
+E -->|Fail| G[Case Manager Tasks and Alerts]
+F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="6" aria-labelledby="s6-title">
+      <h2 id="s6-title">Data model fragmentation map</h2>
+      <p class="subtitle">Intentionally distributed fields mirror real operational complexity.</p>
+      <div class="content">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Salesforce Object</th>
+                <th>Example Fields</th>
+                <th>Primary Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Account (Household)</td>
+                <td>County, address, composition summary</td>
+                <td>Household address differs from most recent form assertion</td>
+              </tr>
+              <tr>
+                <td>Contact</td>
+                <td>Role hint, State ID, agency ID</td>
+                <td>Missing child identifiers and duplicate contact identity</td>
+              </tr>
+              <tr>
+                <td>Role</td>
+                <td>Role type, start/end dates, related case</td>
+                <td>Conflict: same person as caregiver and case worker</td>
+              </tr>
+              <tr>
+                <td>Case</td>
+                <td>Status, consent, placement start/end, stage</td>
+                <td>Eligibility blocked by stage/status/date mismatch</td>
+              </tr>
+              <tr>
+                <td>Form_Submission__c</td>
+                <td>Raw payload, form name, version</td>
+                <td>Stale form version overrides newer system values</td>
+              </tr>
+              <tr>
+                <td>Data_Assertion__c / Task fallback</td>
+                <td>Source, confidence, captured timestamp</td>
+                <td>Lost provenance without assertion or fallback audit task</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="7" aria-labelledby="s7-title">
+      <h2 id="s7-title">Reconciliation engine design</h2>
+      <p class="subtitle">Deterministic controls first, heuristic confidence second.</p>
+      <div class="content grid-2">
+        <article class="card">
+          <h3>Deterministic Layer</h3>
+          <ul>
+            <li>Required field and format checks (dates, phone normalization).</li>
+            <li>Exact key matches when IDs are present.</li>
+            <li>Source-priority rules from mapping configuration.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Heuristic Layer</h3>
+          <ul>
+            <li>Fuzzy name and address similarity scoring.</li>
+            <li>DOB proximity and role plausibility weighting.</li>
+            <li>Human-readable explanation per merge recommendation.</li>
+          </ul>
+        </article>
+        <div class="callout">Conflict detection includes duplicate contacts across households, overlapping case windows, and contradictory guardian assignments.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="8" aria-labelledby="s8-title">
+      <h2 id="s8-title">Compliance gate workflow</h2>
+      <p class="subtitle">No export leaves the system without passing policy checks.</p>
+      <div class="content">
+        <ul class="bullets">
+          <li>Rules: required fields by stage, consent flags, PII restrictions, date logic, case eligibility.</li>
+          <li>Fail-fast mode blocks exports and creates remediation tasks for case managers.</li>
+          <li>Passing path writes audit metadata and prepares package + manifest.</li>
+          <li>All decisions are timestamped to support grant and audit review.</li>
+        </ul>
+        <div class="chip-row">
+          <span class="chip">Gate Status: Pass / Fail</span>
+          <span class="chip">Remediation Tasks</span>
+          <span class="chip">Audit Record</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="9" aria-labelledby="s9-title">
+      <h2 id="s9-title">Live walkthrough plan</h2>
+      <p class="subtitle">Recorded UI flow from operations view to compliance decision.</p>
+      <div class="content grid-2">
+        <article class="card">
+          <h3>Step-by-Step</h3>
+          <ol class="bullets">
+            <li>Open Salesforce Home dashboard for compliance posture.</li>
+            <li>Run blocked export path using messy simulation data.</li>
+            <li>Show generated remediation tasks and failure reasons.</li>
+            <li>Run compliant dataset path and trigger export initiation.</li>
+          </ol>
+        </article>
+        <aside class="card">
+          <h3>What to Click (Salesforce)</h3>
+          <ul>
+            <li>App Launcher -> Service app -> Home.</li>
+            <li>Dashboards -> <strong>MCW Compliance Home</strong>.</li>
+            <li>Tasks list view -> filter <strong>Non-compliant export attempt</strong>.</li>
+            <li>Case record -> confirm consent/status/date updates.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="10" aria-labelledby="s10-title">
+      <h2 id="s10-title">Demo result A: blocked export</h2>
+      <p class="subtitle">Non-compliant records are stopped and routed to operational remediation.</p>
+      <div class="content">
+        <div class="badge-row">
+          <div class="badge blocked">
+            <div class="k">Compliance Gate</div>
+            <div class="v">BLOCKED</div>
+          </div>
+          <div class="badge blocked">
+            <div class="k">Remediation Tasks</div>
+            <div class="v">Created for Case Managers</div>
+          </div>
+          <div class="badge">
+            <div class="k">Failure Categories</div>
+            <div class="v">Consent / Dates / Eligibility</div>
+          </div>
+        </div>
+        <ul class="bullets">
+          <li>Export is denied before package publication.</li>
+          <li>Caseworker queue is populated with actionable remediation tasks.</li>
+          <li>Pipeline logs preserve reason codes for compliance review.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="11" aria-labelledby="s11-title">
+      <h2 id="s11-title">Demo result B: compliant export initiated</h2>
+      <p class="subtitle">Validated payload reaches AWS evidence targets with traceable run context.</p>
+      <div class="content grid-2">
+        <div class="diagram-block">
+          <pre class="diagram-fallback">[Diagram fallback]
+Compliant Data -> Export Package -> Manifest/Audit -> AWS (S3 + Logs + Notifications)</pre>
+          <div class="mermaid" data-diagram="flowchart LR
+A[Compliant Dataset] --> B[Export Package]
+B --> C[Manifest and Audit JSON]
+C --> D[S3 Evidence Prefix]
+C --> E[CloudWatch App Logs]
+C --> F[SNS Notification Path]">diagram</div>
+        </div>
+        <aside class="card">
+          <h3>What to Click (AWS Console)</h3>
+          <ul>
+            <li>CloudWatch -> Log groups -> App Runner application log group.</li>
+            <li>Filter for <strong>POST /export</strong> and <strong>job initiated</strong>.</li>
+            <li>S3 -> target bucket -> <strong>exports/</strong> prefix for package evidence.</li>
+            <li>SNS -> notifications topic for downstream event plumbing.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="12" aria-labelledby="s12-title">
+      <h2 id="s12-title">Business impact and next steps</h2>
+      <p class="subtitle">Pilot to production path with measured governance outcomes.</p>
+      <div class="content grid-2">
+        <article class="card">
+          <h3>Impact placeholders</h3>
+          <ul>
+            <li>Reporting cycle time: <strong>[insert measured metric]</strong></li>
+            <li>Manual reconciliation effort: <strong>[insert measured metric]</strong></li>
+            <li>Compliance exceptions before export: <strong>[insert measured metric]</strong></li>
+          </ul>
+          <h3 style="margin-top:16px;">Next Steps</h3>
+          <ul>
+            <li>Pilot with one county program.</li>
+            <li>Controls hardening (permissions, runbooks, SLOs).</li>
+            <li>Phased rollout with training + audit checkpoints.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Appendix / Q&amp;A Topics</h3>
+          <ul>
+            <li>Field-level mapping governance and source precedence.</li>
+            <li>Fallback behavior when custom assertion object is unavailable.</li>
+            <li>PII handling model and restricted-field export controls.</li>
+            <li>Operational ownership for remediation tasks and SLA policy.</li>
+            <li>AWS evidence retention and observability strategy.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <nav class="actions" aria-label="Slide controls">
+      <button class="btn" id="prevBtn" aria-label="Previous slide">Prev</button>
+      <button class="btn" id="nextBtn" aria-label="Next slide">Next</button>
+      <button class="btn" id="fullBtn" aria-label="Toggle fullscreen">Fullscreen</button>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    <span>Controls: Left/Right, Home/End, F for fullscreen, Esc to exit fullscreen</span>
+    <span id="slideHint">Slide 1: Executive framing and scope</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" defer></script>
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const progressCount = document.getElementById('progressCount');
+      const progressBar = document.getElementById('progressBar');
+      const slideHint = document.getElementById('slideHint');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const fullBtn = document.getElementById('fullBtn');
+      const tapPrev = document.getElementById('tapPrev');
+      const tapNext = document.getElementById('tapNext');
+      let index = 0;
+
+      // Keep slide state update logic in one place for clarity and keyboard support.
+      function updateSlide(nextIndex) {
+        index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+        progressCount.textContent = (index + 1) + ' / ' + slides.length;
+        progressBar.style.width = ((index + 1) / slides.length) * 100 + '%';
+        const title = slides[index].querySelector('h1, h2');
+        slideHint.textContent = 'Slide ' + (index + 1) + ': ' + (title ? title.textContent : '');
+      }
+
+      function next() { updateSlide(index + 1); }
+      function prev() { updateSlide(index - 1); }
+
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+      tapPrev.addEventListener('click', prev);
+      tapNext.addEventListener('click', next);
+
+      fullBtn.addEventListener('click', function () {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      });
+
+      document.addEventListener('keydown', function (event) {
+        const k = event.key;
+        if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { event.preventDefault(); next(); }
+        if (k === 'ArrowLeft' || k === 'PageUp') { event.preventDefault(); prev(); }
+        if (k === 'Home') { event.preventDefault(); updateSlide(0); }
+        if (k === 'End') { event.preventDefault(); updateSlide(slides.length - 1); }
+        if (k === 'f' || k === 'F') {
+          event.preventDefault();
+          if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+          else { document.exitFullscreen(); }
+        }
+      });
+
+      function renderMermaid() {
+        const blocks = Array.from(document.querySelectorAll('.mermaid'));
+        if (!window.mermaid || !blocks.length) { return; }
+
+        try {
+          window.mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            securityLevel: 'loose',
+            themeVariables: {
+              primaryColor: '#0f2133',
+              primaryTextColor: '#e6edf4',
+              primaryBorderColor: '#29b8a8',
+              lineColor: '#7ce0d5',
+              secondaryColor: '#16324a',
+              tertiaryColor: '#10253a',
+              fontFamily: 'Segoe UI'
+            }
+          });
+
+          blocks.forEach(function (block, i) {
+            const source = block.getAttribute('data-diagram') || '';
+            window.mermaid.render('m' + i, source).then(function (rendered) {
+              block.innerHTML = rendered.svg;
+              block.classList.add('ready');
+              const fallback = block.previousElementSibling;
+              if (fallback && fallback.classList.contains('diagram-fallback')) {
+                fallback.classList.add('hidden');
+              }
+            }).catch(function () {
+              // If render fails, fallback text remains visible by design.
+            });
+          });
+        } catch (error) {
+          // If Mermaid is unavailable, fallback text remains visible by design.
+        }
+      }
+
+      updateSlide(0);
+      window.addEventListener('load', renderMermaid);
+    })();
+  </script>
+</body>
+</html>
