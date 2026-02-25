@@ -436,36 +436,36 @@
     </section>
 
     <section class="slide" data-slide="2" aria-labelledby="s2-title">
-      <h2 id="s2-title">Problem: Why teams lose reporting time</h2>
-      <p class="subtitle">Current-state operations are accurate only after heavy manual cleanup.</p>
+      <h2 id="s2-title">The problem in plain terms</h2>
+      <p class="subtitle">Teams spend too much time fixing data before they can report.</p>
       <div class="content">
         <ul class="bullets">
-          <li>Case data is spread across multiple systems with inconsistent IDs and formats.</li>
-          <li>Manual reconciliation introduces delays, rework, and avoidable compliance risk.</li>
-          <li>Grant reporting deadlines depend on tribal knowledge instead of deterministic controls.</li>
-          <li>Audit trails are incomplete when provenance and decisions are not captured in-line.</li>
+          <li>Important case details live in different places and do not always match.</li>
+          <li>Staff manually compare records, which is slow and easy to get wrong.</li>
+          <li>Reporting deadlines are harder to meet when cleanup happens at the last minute.</li>
+          <li>Audit evidence is weaker when decisions are not captured consistently.</li>
         </ul>
       </div>
     </section>
 
     <section class="slide" data-slide="3" aria-labelledby="s3-title">
       <h2 id="s3-title">Use Case: Streamline grant reporting</h2>
-      <p class="subtitle">Goal: move from spreadsheet governance to operational compliance by design.</p>
+      <p class="subtitle">Goal: make reporting faster, safer, and easier for operations teams.</p>
       <div class="content grid-2">
         <article class="card">
-          <h3>Operational Intent</h3>
+          <h3>What we change</h3>
           <ul>
-            <li>Reconcile messy records before export eligibility is evaluated.</li>
-            <li>Block non-compliant payloads with immediate remediation actions.</li>
-            <li>Publish only validated packages to AWS evidence targets.</li>
+            <li>Clean and align records before any export is allowed.</li>
+            <li>Stop non-compliant exports and create clear follow-up tasks.</li>
+            <li>Send only approved data packages to AWS evidence storage.</li>
           </ul>
         </article>
         <article class="card">
-          <h3>Success Criteria</h3>
+          <h3>What success looks like</h3>
           <ul>
-            <li>Repeatable checks, explicit ownership, and timestamped decisions.</li>
-            <li>Caseworker-visible tasking for unresolved data quality issues.</li>
-            <li>Audit-ready output with immutable package and run context.</li>
+            <li>Same checks every time, with clear ownership.</li>
+            <li>Caseworkers see exactly what to fix and why.</li>
+            <li>Audit-ready records with timestamps and evidence.</li>
           </ul>
         </article>
       </div>
@@ -563,41 +563,41 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
     </section>
 
     <section class="slide" data-slide="7" aria-labelledby="s7-title">
-      <h2 id="s7-title">Reconciliation engine design</h2>
-      <p class="subtitle">Deterministic controls first, heuristic confidence second.</p>
+      <h2 id="s7-title">How matching works</h2>
+      <p class="subtitle">Simple rules first, smart scoring second.</p>
       <div class="content grid-2">
         <article class="card">
-          <h3>Deterministic Layer</h3>
+          <h3>Rule checks (always applied)</h3>
           <ul>
-            <li>Required field and format checks (dates, phone normalization).</li>
-            <li>Exact key matches when IDs are present.</li>
-            <li>Source-priority rules from mapping configuration.</li>
+            <li>Required fields and format checks (dates, phone).</li>
+            <li>Exact ID matches when unique IDs are available.</li>
+            <li>Source priority rules decide which value wins.</li>
           </ul>
         </article>
         <article class="card">
-          <h3>Heuristic Layer</h3>
+          <h3>Smart scoring (when data is messy)</h3>
           <ul>
-            <li>Fuzzy name and address similarity scoring.</li>
-            <li>DOB proximity and role plausibility weighting.</li>
-            <li>Human-readable explanation per merge recommendation.</li>
+            <li>Name and address similarity scoring.</li>
+            <li>DOB and role plausibility checks.</li>
+            <li>Clear explanation for every merge recommendation.</li>
           </ul>
         </article>
-        <div class="callout">Conflict detection includes duplicate contacts across households, overlapping case windows, and contradictory guardian assignments.</div>
+        <div class="callout">The system flags common issues: duplicate people, overlapping case dates, and conflicting role assignments.</div>
       </div>
     </section>
 
     <section class="slide" data-slide="8" aria-labelledby="s8-title">
-      <h2 id="s8-title">Compliance gate workflow</h2>
-      <p class="subtitle">No export leaves the system without passing policy checks.</p>
+      <h2 id="s8-title">Compliance gate</h2>
+      <p class="subtitle">No export goes out until policy checks pass.</p>
       <div class="content">
         <ul class="bullets">
-          <li>Rules: required fields by stage, consent flags, PII restrictions, date logic, case eligibility.</li>
-          <li>Fail-fast mode blocks exports and creates remediation tasks for case managers.</li>
-          <li>Passing path writes audit metadata and prepares package + manifest.</li>
-          <li>All decisions are timestamped to support grant and audit review.</li>
+          <li>Checks include required fields, consent, restricted data, date logic, and case status.</li>
+          <li>If a check fails, export is blocked and a remediation task is created.</li>
+          <li>If all checks pass, the package is prepared with audit context.</li>
+          <li>Every decision is timestamped for reporting and audit review.</li>
         </ul>
         <div class="chip-row">
-          <span class="chip">Gate Status: Pass / Fail</span>
+          <span class="chip">Status: Pass / Fail</span>
           <span class="chip">Remediation Tasks</span>
           <span class="chip">Audit Record</span>
         </div>
@@ -605,25 +605,23 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
     </section>
 
     <section class="slide" data-slide="9" aria-labelledby="s9-title">
-      <h2 id="s9-title">Live walkthrough plan</h2>
-      <p class="subtitle">Recorded UI flow from operations view to compliance decision.</p>
+      <h2 id="s9-title">Solution summary</h2>
+      <p class="subtitle">One flow from messy records to compliant export evidence.</p>
       <div class="content grid-2">
         <article class="card">
-          <h3>Step-by-Step</h3>
-          <ol class="bullets">
-            <li>Open Salesforce Home dashboard for compliance posture.</li>
-            <li>Run blocked export path using messy simulation data.</li>
-            <li>Show generated remediation tasks and failure reasons.</li>
-            <li>Run compliant dataset path and trigger export initiation.</li>
-          </ol>
+          <h3>Before</h3>
+          <ul>
+            <li>Teams chase data issues near reporting deadlines.</li>
+            <li>Compliance review is manual and inconsistent.</li>
+            <li>Evidence collection happens after the fact.</li>
+          </ul>
         </article>
         <aside class="card">
-          <h3>What to Click (Salesforce)</h3>
+          <h3>After</h3>
           <ul>
-            <li>App Launcher -> Service app -> Home.</li>
-            <li>Dashboards -> <strong>MCW Compliance Home</strong>.</li>
-            <li>Tasks list view -> filter <strong>Non-compliant export attempt</strong>.</li>
-            <li>Case record -> confirm consent/status/date updates.</li>
+            <li>Data is reconciled and scored before export.</li>
+            <li>Non-compliant records are blocked with clear tasks.</li>
+            <li>Compliant packages are auditable and publish-ready.</li>
           </ul>
         </aside>
       </div>
@@ -656,57 +654,62 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
     </section>
 
     <section class="slide" data-slide="11" aria-labelledby="s11-title">
-      <h2 id="s11-title">Demo result B: compliant export initiated</h2>
-      <p class="subtitle">Validated payload reaches AWS evidence targets with traceable run context.</p>
-      <div class="content grid-2">
-        <div class="diagram-block">
-          <pre class="diagram-fallback">[Diagram fallback]
-Compliant Data -> Export Package -> Manifest/Audit -> AWS (S3 + Logs + Notifications)</pre>
-          <div class="mermaid" data-diagram="flowchart LR
-A[Compliant Dataset] --> B[Export Package]
-B --> C[Manifest and Audit JSON]
-C --> D[S3 Evidence Prefix]
-C --> E[CloudWatch App Logs]
-C --> F[SNS Notification Path]">diagram</div>
-        </div>
-        <aside class="card">
-          <h3>What to Click (AWS Console)</h3>
-          <ul>
-            <li>CloudWatch -> Log groups -> App Runner application log group.</li>
-            <li>Filter for <strong>POST /export</strong> and <strong>job initiated</strong>.</li>
-            <li>S3 -> target bucket -> <strong>exports/</strong> prefix for package evidence.</li>
-            <li>SNS -> notifications topic for downstream event plumbing.</li>
-          </ul>
-        </aside>
-      </div>
-    </section>
-
-    <section class="slide" data-slide="12" aria-labelledby="s12-title">
-      <h2 id="s12-title">Business impact and next steps</h2>
-      <p class="subtitle">Pilot to production path with measured governance outcomes.</p>
+      <h2 id="s11-title">Business impact and next steps</h2>
+      <p class="subtitle">General improvement placeholders (no hardcoded metrics).</p>
       <div class="content grid-2">
         <article class="card">
           <h3>Impact placeholders</h3>
           <ul>
-            <li>Reporting cycle time: <strong>[insert measured metric]</strong></li>
-            <li>Manual reconciliation effort: <strong>[insert measured metric]</strong></li>
-            <li>Compliance exceptions before export: <strong>[insert measured metric]</strong></li>
+            <li>Reporting speed: <strong>[insert % increase]</strong></li>
+            <li>Manual cleanup effort: <strong>[insert % decrease]</strong></li>
+            <li>On-time grant submissions: <strong>[insert % increase]</strong></li>
+            <li>Compliance exceptions before export: <strong>[insert % decrease]</strong></li>
           </ul>
           <h3 style="margin-top:16px;">Next Steps</h3>
           <ul>
             <li>Pilot with one county program.</li>
-            <li>Controls hardening (permissions, runbooks, SLOs).</li>
-            <li>Phased rollout with training + audit checkpoints.</li>
+            <li>Harden controls, monitoring, and SOPs.</li>
+            <li>Roll out by region with training and checkpoints.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Simple message</h3>
+          <ul>
+            <li>Less manual work for case teams.</li>
+            <li>Cleaner data before reporting deadlines.</li>
+            <li>Stronger audit confidence with clear evidence.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="12" aria-labelledby="s12-title">
+      <h2 id="s12-title">Live UI walkthrough (final section)</h2>
+      <p class="subtitle">End with proof: blocked path, compliant path, and AWS evidence update.</p>
+      <div class="content grid-2">
+        <article class="card">
+          <h3>Walkthrough order</h3>
+          <ol class="bullets">
+            <li>Salesforce Home -> show compliance dashboard posture.</li>
+            <li>Run blocked export -> show remediation tasks created.</li>
+            <li>Run compliant export -> show initiated status and export ID.</li>
+            <li>Open AWS logs/storage -> verify evidence was updated.</li>
+          </ol>
+          <h3 style="margin-top:16px;">What to click</h3>
+          <ul>
+            <li><strong>Salesforce:</strong> Service app -> Home -> Tasks.</li>
+            <li><strong>API docs:</strong> /docs -> POST /compliance and POST /export.</li>
+            <li><strong>AWS:</strong> CloudWatch log group + S3 exports prefix.</li>
           </ul>
         </article>
         <article class="card">
           <h3>Appendix / Q&amp;A Topics</h3>
           <ul>
-            <li>Field-level mapping governance and source precedence.</li>
-            <li>Fallback behavior when custom assertion object is unavailable.</li>
-            <li>PII handling model and restricted-field export controls.</li>
-            <li>Operational ownership for remediation tasks and SLA policy.</li>
-            <li>AWS evidence retention and observability strategy.</li>
+            <li>How source-priority rules are approved and maintained.</li>
+            <li>How fallback auditing works when custom objects are unavailable.</li>
+            <li>How restricted data is excluded from exports.</li>
+            <li>Who owns remediation SLAs and review cadence.</li>
+            <li>How AWS evidence retention is monitored.</li>
           </ul>
         </article>
       </div>
