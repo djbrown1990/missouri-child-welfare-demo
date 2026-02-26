@@ -691,21 +691,22 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
 
     <section class="slide" data-slide="12" aria-labelledby="s12-title">
       <h2 id="s12-title">Live UI walkthrough (final section)</h2>
-      <p class="subtitle">End with proof: blocked path now, then pass-path evidence and optional AWS validation.</p>
+      <p class="subtitle">End with proof from one API call: blocked first, auto-resolved, then compliant export.</p>
       <div class="content grid-2">
         <article class="card">
           <h3>Walkthrough order</h3>
           <ol class="bullets">
             <li>Salesforce Home -> show compliance dashboard posture.</li>
-            <li>Run blocked export -> show task + simulated email alert + AI guidance text.</li>
-            <li>Show compliant run evidence from prepared pass artifacts (`out/pipeline_pass`).</li>
-            <li>Verify local export evidence (`govcloud_outbox`); if deployed, also verify AWS targets.</li>
+            <li>Run one `/export` call with `auto_resolve_after_block=true`.</li>
+            <li>Show `initial_result` blocked -> task + simulated email + AI guidance text.</li>
+            <li>Show `resolved_result` initiated -> export ID and manifest evidence.</li>
+            <li>Verify local outbox evidence; if deployed, also verify AWS targets.</li>
           </ol>
           <h3 style="margin-top:16px;">What to click</h3>
           <ul>
             <li><strong>Salesforce:</strong> Service app -> Home -> Tasks (open latest compliance remediation task).</li>
-            <li><strong>API docs:</strong> /docs -> POST /compliance and POST /export.</li>
-            <li><strong>Evidence:</strong> `out/pipeline/notifications.jsonl`, `out/pipeline/audit.json`, and `out/pipeline/govcloud_outbox/`.</li>
+            <li><strong>API docs:</strong> /docs -> POST /export (set `auto_resolve_after_block=true`).</li>
+            <li><strong>Evidence:</strong> `out/pipeline/notifications.jsonl`, `out/pipeline/audit.json`, and `out/pipeline_pass_auto/govcloud_outbox/`.</li>
             <li><strong>AWS (optional):</strong> CloudWatch log group + S3 exports prefix.</li>
           </ul>
         </article>
