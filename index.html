@@ -601,7 +601,7 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
       <div class="content">
         <ul class="bullets">
           <li>Checks include required fields, consent, restricted data, date logic, and case status.</li>
-          <li>If a check fails, Salesforce Flow creates a remediation task and sends an email alert to the case owner.</li>
+          <li>If a check fails, Salesforce Flow creates a remediation task and logs a simulated email alert to the case owner.</li>
           <li>AI-style guidance is attached so caseworkers know the next best action immediately.</li>
           <li>If all checks pass, the package is prepared with audit context.</li>
           <li>Every decision is timestamped for reporting and audit review.</li>
@@ -658,7 +658,7 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
         </div>
         <ul class="bullets">
           <li>Export is denied before package publication.</li>
-          <li>Caseworker queue gets an actionable task plus email notification.</li>
+          <li>Caseworker queue gets an actionable task plus simulated email notification evidence.</li>
           <li>AI-style remediation text explains how to fix the record quickly.</li>
           <li>Pipeline logs preserve reason codes for compliance review.</li>
         </ul>
@@ -691,21 +691,22 @@ F --> H[AWS Evidence Targets\nS3 Logs Notifications]">diagram</div>
 
     <section class="slide" data-slide="12" aria-labelledby="s12-title">
       <h2 id="s12-title">Live UI walkthrough (final section)</h2>
-      <p class="subtitle">End with proof: blocked path, compliant path, and AWS evidence update.</p>
+      <p class="subtitle">End with proof: blocked path now, then pass-path evidence and optional AWS validation.</p>
       <div class="content grid-2">
         <article class="card">
           <h3>Walkthrough order</h3>
           <ol class="bullets">
             <li>Salesforce Home -> show compliance dashboard posture.</li>
-            <li>Run blocked export -> show task + email alert + AI guidance text.</li>
-            <li>Run compliant export -> show initiated status and export ID.</li>
-            <li>Open AWS logs/storage -> verify evidence was updated.</li>
+            <li>Run blocked export -> show task + simulated email alert + AI guidance text.</li>
+            <li>Show compliant run evidence from prepared pass artifacts (`out/pipeline_pass`).</li>
+            <li>Verify local export evidence (`govcloud_outbox`); if deployed, also verify AWS targets.</li>
           </ol>
           <h3 style="margin-top:16px;">What to click</h3>
           <ul>
-            <li><strong>Salesforce:</strong> Service app -> Home -> Tasks -> related email alert evidence.</li>
+            <li><strong>Salesforce:</strong> Service app -> Home -> Tasks (open latest compliance remediation task).</li>
             <li><strong>API docs:</strong> /docs -> POST /compliance and POST /export.</li>
-            <li><strong>AWS:</strong> CloudWatch log group + S3 exports prefix.</li>
+            <li><strong>Evidence:</strong> `out/pipeline/notifications.jsonl`, `out/pipeline/audit.json`, and `out/pipeline/govcloud_outbox/`.</li>
+            <li><strong>AWS (optional):</strong> CloudWatch log group + S3 exports prefix.</li>
           </ul>
         </article>
         <article class="card">
